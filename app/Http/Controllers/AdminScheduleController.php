@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\DB;
 
 class AdminScheduleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $schedules = DB::table('schedules')
+        $tab = $request->query('tab', 'today');
+
+        $query = DB::table('schedules')
             ->join('trains', 'schedules.train_id', '=', 'trains.train_id')
             ->join('stations as dep_st', 'schedules.departure_station', '=', 'dep_st.station_id')
             ->join('stations as arr_st', 'schedules.arrival_station', '=', 'arr_st.station_id')
@@ -18,14 +20,26 @@ class AdminScheduleController extends Controller
                 'trains.train_name',
                 'dep_st.station_name as dep_station',
                 'arr_st.station_name as arr_station'
-            )
-            ->orderBy('schedules.departure_time', 'desc')
-            ->get();
+            );
+
+        if ($tab === 'past') {
+            $query->whereDate('schedules.departure_time', '<', now()->toDateString())
+                  ->orderBy('schedules.departure_time', 'desc');
+        } elseif ($tab === 'upcoming') {
+            $query->whereDate('schedules.departure_time', '>', now()->toDateString())
+                  ->orderBy('schedules.departure_time', 'asc');
+        } else {
+            // Default to 'today'
+            $query->whereDate('schedules.departure_time', '=', now()->toDateString())
+                  ->orderBy('schedules.departure_time', 'asc');
+        }
+
+        $schedules = $query->paginate(10);
 
         $trains = DB::table('trains')->get();
         $stations = DB::table('stations')->get();
 
-        return view('admin.schedules', compact('schedules', 'trains', 'stations'));
+        return view('admin.schedules', compact('schedules', 'trains', 'stations', 'tab'));
     }
 
     public function store(Request $request)

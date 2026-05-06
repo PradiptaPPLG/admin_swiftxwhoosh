@@ -60,8 +60,9 @@
                 </div>
             </div>
             <div class="mt-8">
-                <button type="submit" class="px-8 py-3 bg-swift-red text-white font-bold rounded-xl hover:bg-red-700 transition shadow-lg shadow-red-500/30">
-                    Publish Schedule
+                <button type="submit" class="w-full md:w-auto px-8 py-3.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-md shadow-slate-200 active:scale-[0.99] flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    <span>Save Schedule Information</span>
                 </button>
             </div>
         </form>
@@ -69,7 +70,22 @@
 
     <!-- Schedules List -->
     <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-        <h2 class="text-xl font-bold text-slate-800 mb-6">Active Schedules</h2>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+            <h2 class="text-xl font-bold text-slate-800">
+                @if($tab === 'past')
+                    Past Schedules
+                @elseif($tab === 'upcoming')
+                    Upcoming Schedules
+                @else
+                    Today's Schedules
+                @endif
+            </h2>
+            <div class="flex space-x-2 bg-slate-50 p-1 rounded-xl border border-slate-200 w-max">
+                <a href="{{ route('admin.schedules', ['tab' => 'today']) }}" class="px-4 py-2 rounded-lg text-sm font-bold transition-all {{ $tab === 'today' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700' }}">Today</a>
+                <a href="{{ route('admin.schedules', ['tab' => 'upcoming']) }}" class="px-4 py-2 rounded-lg text-sm font-bold transition-all {{ $tab === 'upcoming' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700' }}">Upcoming</a>
+                <a href="{{ route('admin.schedules', ['tab' => 'past']) }}" class="px-4 py-2 rounded-lg text-sm font-bold transition-all {{ $tab === 'past' ? 'bg-white shadow-sm text-slate-800' : 'text-slate-500 hover:text-slate-700' }}">Past History</a>
+            </div>
+        </div>
         
         <div class="overflow-x-auto">
             <table class="w-full text-left">
@@ -127,6 +143,10 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="mt-6">
+            {{ $schedules->appends(['tab' => $tab])->links('pagination::tailwind') }}
         </div>
     </div>
 

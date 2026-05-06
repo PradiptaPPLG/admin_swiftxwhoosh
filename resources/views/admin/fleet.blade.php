@@ -7,40 +7,47 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     
     <!-- Add New Train Form -->
-    <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 h-fit">
-        <h2 class="text-xl font-bold text-slate-800 mb-6">Add New Train</h2>
+    <div class="saas-card p-8 h-fit">
+        <div class="flex items-center space-x-3 mb-6">
+            <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </div>
+            <h2 class="text-lg font-bold text-slate-800">Add New Train</h2>
+        </div>
         
         @if(session('success'))
-            <div class="bg-green-50 text-green-600 p-4 rounded-xl text-sm font-medium mb-6 border border-green-200">
+            <div class="bg-emerald-50 text-emerald-600 p-4 rounded-xl text-xs font-bold mb-6 border border-emerald-100 flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 {{ session('success') }}
             </div>
         @endif
 
         <form action="{{ route('admin.fleet.store') }}" method="POST">
             @csrf
-            <div class="space-y-5">
+            <div class="space-y-6">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-600 mb-2">Train Name</label>
-                    <input type="text" name="train_name" required placeholder="e.g. Whoosh VIP" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-swift-red/50 transition">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Train Name</label>
+                    <input type="text" name="train_name" required placeholder="e.g. Whoosh VIP" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-400 transition-all placeholder:text-slate-300">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-600 mb-2">Train Code</label>
-                    <input type="text" name="train_code" required placeholder="e.g. W-VIP-03" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-swift-red/50 transition">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Train Code</label>
+                    <input type="text" name="train_code" required placeholder="e.g. W-VIP-03" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-400 transition-all placeholder:text-slate-300">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-600 mb-2">Total Seats</label>
-                    <input type="number" name="total_seats" required value="600" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-swift-red/50 transition">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Total Seats</label>
+                    <input type="number" name="total_seats" required value="600" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-slate-900/5 focus:border-slate-400 transition-all">
                 </div>
-                <button type="submit" class="w-full py-3 bg-swift-red text-white font-bold rounded-xl hover:bg-red-700 transition shadow-lg shadow-red-500/30">
-                    Save Train
+                <button type="submit" class="w-full py-3.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-md shadow-slate-200 active:scale-[0.99] flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    <span>Save Train Information</span>
                 </button>
             </div>
         </form>
     </div>
 
     <!-- Train List -->
-    <div class="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-        <h2 class="text-xl font-bold text-slate-800 mb-6">Registered Trains</h2>
+    <div class="lg:col-span-2 saas-card p-8">
+        <h2 class="text-xl font-bold text-slate-800 mb-6 tracking-tight">Registered Trains</h2>
         
         <div class="overflow-x-auto">
             <table class="w-full text-left">
