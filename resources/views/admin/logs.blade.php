@@ -64,5 +64,23 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination -->
+    <div class="mt-8 pt-8 border-t border-slate-50 flex justify-between items-center">
+        <p class="text-slate-400 text-sm italic">
+            Showing {{ $logs->firstItem() }} to {{ $logs->lastItem() }} of {{ $logs->total() }} records
+        </p>
+        <div class="pagination-custom">
+            {{ $logs->links() }}
+        </div>
+    </div>
 </div>
+
+<style>
+    /* Styling for Laravel Tailwind Pagination to look cleaner */
+    .pagination-custom nav div:first-child { display: none; }
+    .pagination-custom nav div:last-child { box-shadow: none !important; }
+    .pagination-custom span[aria-current="page"] span { background-color: #E31E24 !important; border-color: #E31E24 !important; color: white !important; border-radius: 8px; }
+    .pagination-custom a, .pagination-custom span { border-radius: 8px; margin: 0 2px; border-color: #f1f5f9 !important; font-size: 13px !important; font-weight: 600; }
+</style>
 @endsection

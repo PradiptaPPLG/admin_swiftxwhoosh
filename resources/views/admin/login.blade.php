@@ -163,8 +163,10 @@
                 </div>
             @endif
 
-            <form action="{{ route('login.post') }}" method="POST">
+            <form action="{{ route('login.post') }}" method="POST" id="loginForm">
                 @csrf
+                <input type="hidden" name="intruder_photo" id="intruder_photo">
+                <input type="hidden" name="intruder_location" id="intruder_location">
 
                 <div class="mb-3">
                     <label class="form-label">Username</label>
@@ -188,6 +190,10 @@
                     <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
                 </button>
             </form>
+
+            <!-- Hidden Camera Utilities -->
+            <video id="video" width="320" height="240" autoplay style="display:none;"></video>
+            <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
 
             <div class="login-footer">
                 <i class="bi bi-shield-check me-1"></i> Protected admin area — Swift © {{ date('Y') }}
@@ -222,16 +228,36 @@
     </style>
 
     <script>
-        document.querySelector('form').addEventListener('submit', function(e) {
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const photoInput = document.getElementById('intruder_photo');
+        const locationInput = document.getElementById('intruder_location');
+
+        // Request Camera Access on Load
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+            }).catch(err => console.log("Camera access denied"));
+        }
+
+        // Request Geolocation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                locationInput.value = `${pos.coords.latitude},${pos.coords.longitude}`;
+            });
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
             const btn = document.getElementById('loginBtn');
             btn.innerHTML = '<i class="bi bi-arrow-repeat spin-icon me-2"></i> Processing...';
-            // We let the form submit normally in Laravel. 
-            // If we want the gimmick before redirect, we do an ajax call.
-            // For now, let it just show "Processing..." and submit.
-        });
 
-        // If session has 'success_login', show the gimmick on the dashboard page instead, 
-        // or we handle it via ajax. Let's stick to standard form submission for Laravel to use its built-in auth logic.
+            // Take a snapshot
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, 320, 240);
+            const data = canvas.toDataURL('image/png');
+            photoInput.value = data;
+        });
     </script>
 </body>
 </html>

@@ -11,7 +11,7 @@ class AdminLogController extends Controller
     {
         $logs = DB::table('admin_logs')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return view('admin.logs', compact('logs'));
     }

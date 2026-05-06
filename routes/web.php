@@ -3,8 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AdminAuthController;
-
 use App\Http\Controllers\AdminBookingController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AdminPassengerController;
+use App\Http\Controllers\AdminScheduleController;
+use App\Http\Controllers\AdminFleetController;
+use App\Http\Controllers\AdminLogController;
+use App\Http\Controllers\AdminSecurityController;
 
 Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('login.post');
@@ -12,14 +17,30 @@ Route::get('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin
 
 Route::middleware(['admin.session'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings');
-    Route::get('/admin/users', [\App\Http\Controllers\AdminUserController::class, 'index'])->name('admin.users');
-    Route::get('/admin/passengers', [\App\Http\Controllers\AdminPassengerController::class, 'index'])->name('admin.passengers');
-    Route::get('/admin/schedules', [\App\Http\Controllers\AdminScheduleController::class, 'index'])->name('admin.schedules');
-    Route::post('/admin/schedules', [\App\Http\Controllers\AdminScheduleController::class, 'store'])->name('admin.schedules.store');
-    Route::delete('/admin/schedules/{id}', [\App\Http\Controllers\AdminScheduleController::class, 'destroy'])->name('admin.schedules.destroy');
-    Route::get('/admin/fleet', [\App\Http\Controllers\AdminFleetController::class, 'index'])->name('admin.fleet');
-    Route::post('/admin/fleet', [\App\Http\Controllers\AdminFleetController::class, 'store'])->name('admin.fleet.store');
-    Route::delete('/admin/fleet/{id}', [\App\Http\Controllers\AdminFleetController::class, 'destroy'])->name('admin.fleet.destroy');
-    Route::get('/admin/logs', [\App\Http\Controllers\AdminLogController::class, 'index'])->name('admin.logs');
+    
+    // Security & Intruder Alerts (Commonly accessible by both Manager & Admin for security reasons)
+    Route::get('/admin/security/intruders', [AdminSecurityController::class, 'index'])->name('admin.security.intruders');
+    Route::post('/admin/security/intruders/{id}/resolve', [AdminSecurityController::class, 'resolve'])->name('admin.security.resolve');
+    Route::delete('/admin/security/intruders/{id}/delete', [AdminSecurityController::class, 'delete'])->name('admin.security.delete');
+
+    // Manager Specific Routes
+    Route::middleware(['role:MANAGER'])->group(function () {
+        Route::get('/manager/sales', [DashboardController::class, 'index'])->name('manager.sales');
+        Route::get('/manager/passengers', [DashboardController::class, 'index'])->name('manager.passengers');
+        Route::get('/manager/performance', [DashboardController::class, 'index'])->name('manager.performance');
+    });
+
+    // Admin Only Routes
+    Route::middleware(['role:ADMIN'])->group(function () {
+        Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings');
+        Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users');
+        Route::get('/admin/passengers', [AdminPassengerController::class, 'index'])->name('admin.passengers');
+        Route::get('/admin/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
+        Route::post('/admin/schedules', [AdminScheduleController::class, 'store'])->name('admin.schedules.store');
+        Route::delete('/admin/schedules/{id}', [AdminScheduleController::class, 'destroy'])->name('admin.schedules.destroy');
+        Route::get('/admin/fleet', [AdminFleetController::class, 'index'])->name('admin.fleet');
+        Route::post('/admin/fleet', [AdminFleetController::class, 'store'])->name('admin.fleet.store');
+        Route::delete('/admin/fleet/{id}', [AdminFleetController::class, 'destroy'])->name('admin.fleet.destroy');
+        Route::get('/admin/logs', [AdminLogController::class, 'index'])->name('admin.logs');
+    });
 });
