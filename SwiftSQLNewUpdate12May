@@ -1,0 +1,1518 @@
+--
+-- PostgreSQL database dump
+--
+
+\restrict zsK1Ugcl11jiKpxeruIJ12VM12DblxnPFzGR6DIKD3LRS2v0eqFWhfc1dgBTxch
+
+-- Dumped from database version 18.3
+-- Dumped by pg_dump version 18.3
+
+-- Started on 2026-05-12 09:00:59
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- TOC entry 242 (class 1259 OID 49642)
+-- Name: admin_logs; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.admin_logs (
+    id integer NOT NULL,
+    admin_id integer,
+    admin_name character varying(100),
+    action character varying(255) NOT NULL,
+    target text,
+    ip_address character varying(50),
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.admin_logs OWNER TO postgres;
+
+--
+-- TOC entry 241 (class 1259 OID 49641)
+-- Name: admin_logs_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.admin_logs_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.admin_logs_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5202 (class 0 OID 0)
+-- Dependencies: 241
+-- Name: admin_logs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.admin_logs_id_seq OWNED BY public.admin_logs.id;
+
+
+--
+-- TOC entry 240 (class 1259 OID 49628)
+-- Name: admins; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.admins (
+    id integer NOT NULL,
+    username character varying(50) NOT NULL,
+    password character varying(255) NOT NULL,
+    name character varying(100) NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    role character varying(255) DEFAULT 'ADMIN'::character varying
+);
+
+
+ALTER TABLE public.admins OWNER TO postgres;
+
+--
+-- TOC entry 239 (class 1259 OID 49627)
+-- Name: admins_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.admins_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.admins_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5203 (class 0 OID 0)
+-- Dependencies: 239
+-- Name: admins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.admins_id_seq OWNED BY public.admins.id;
+
+
+--
+-- TOC entry 232 (class 1259 OID 41525)
+-- Name: booking_passengers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.booking_passengers (
+    passenger_id integer NOT NULL,
+    booking_id integer,
+    full_name character varying(100),
+    id_number character varying(30),
+    seat_id integer,
+    seat_class character varying(255) DEFAULT 'ECONOMY'::character varying,
+    passenger_type character varying(255) DEFAULT 'UMUM'::character varying
+);
+
+
+ALTER TABLE public.booking_passengers OWNER TO postgres;
+
+--
+-- TOC entry 231 (class 1259 OID 41524)
+-- Name: booking_passengers_passenger_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.booking_passengers_passenger_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.booking_passengers_passenger_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5204 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: booking_passengers_passenger_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.booking_passengers_passenger_id_seq OWNED BY public.booking_passengers.passenger_id;
+
+
+--
+-- TOC entry 230 (class 1259 OID 41502)
+-- Name: bookings; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.bookings (
+    booking_id integer NOT NULL,
+    user_id integer,
+    schedule_id integer,
+    booking_code character varying(20),
+    booking_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    total_price numeric(12,2),
+    status character varying(20) DEFAULT 'pending'::character varying,
+    payment_method character varying(255) DEFAULT 'QRIS'::character varying,
+    CONSTRAINT bookings_status_check CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'paid'::character varying, 'cancelled'::character varying, 'completed'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.bookings OWNER TO postgres;
+
+--
+-- TOC entry 229 (class 1259 OID 41501)
+-- Name: bookings_booking_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.bookings_booking_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.bookings_booking_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5205 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: bookings_booking_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.bookings_booking_id_seq OWNED BY public.bookings.booking_id;
+
+
+--
+-- TOC entry 248 (class 1259 OID 65996)
+-- Name: failed_transactions; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.failed_transactions (
+    id integer NOT NULL,
+    user_id integer,
+    schedule_id integer,
+    error_reason text NOT NULL,
+    payload text,
+    ip_address character varying(45),
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.failed_transactions OWNER TO postgres;
+
+--
+-- TOC entry 247 (class 1259 OID 65995)
+-- Name: failed_transactions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.failed_transactions_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.failed_transactions_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5206 (class 0 OID 0)
+-- Dependencies: 247
+-- Name: failed_transactions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.failed_transactions_id_seq OWNED BY public.failed_transactions.id;
+
+
+--
+-- TOC entry 246 (class 1259 OID 57824)
+-- Name: intruder_alerts; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.intruder_alerts (
+    id integer NOT NULL,
+    ip_address character varying(255),
+    username_attempted character varying(255),
+    photo_path character varying(255),
+    location character varying(255),
+    city character varying(255),
+    browser character varying(255),
+    attempt_time timestamp without time zone,
+    is_resolved boolean DEFAULT false,
+    created_at timestamp without time zone,
+    updated_at timestamp without time zone
+);
+
+
+ALTER TABLE public.intruder_alerts OWNER TO postgres;
+
+--
+-- TOC entry 245 (class 1259 OID 57823)
+-- Name: intruder_alerts_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.intruder_alerts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.intruder_alerts_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5207 (class 0 OID 0)
+-- Dependencies: 245
+-- Name: intruder_alerts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.intruder_alerts_id_seq OWNED BY public.intruder_alerts.id;
+
+
+--
+-- TOC entry 244 (class 1259 OID 57803)
+-- Name: migrations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.migrations (
+    id integer NOT NULL,
+    migration character varying(255) NOT NULL,
+    batch integer NOT NULL
+);
+
+
+ALTER TABLE public.migrations OWNER TO postgres;
+
+--
+-- TOC entry 243 (class 1259 OID 57802)
+-- Name: migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.migrations_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.migrations_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5208 (class 0 OID 0)
+-- Dependencies: 243
+-- Name: migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.migrations_id_seq OWNED BY public.migrations.id;
+
+
+--
+-- TOC entry 234 (class 1259 OID 41543)
+-- Name: payments; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.payments (
+    payment_id integer NOT NULL,
+    booking_id integer,
+    payment_method character varying(20),
+    payment_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    amount numeric(12,2),
+    payment_status character varying(20) DEFAULT 'pending'::character varying,
+    CONSTRAINT payments_payment_method_check CHECK (((payment_method)::text = ANY ((ARRAY['bank_transfer'::character varying, 'ewallet'::character varying, 'credit_card'::character varying])::text[]))),
+    CONSTRAINT payments_payment_status_check CHECK (((payment_status)::text = ANY ((ARRAY['pending'::character varying, 'success'::character varying, 'failed'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.payments OWNER TO postgres;
+
+--
+-- TOC entry 233 (class 1259 OID 41542)
+-- Name: payments_payment_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.payments_payment_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.payments_payment_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5209 (class 0 OID 0)
+-- Dependencies: 233
+-- Name: payments_payment_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.payments_payment_id_seq OWNED BY public.payments.payment_id;
+
+
+--
+-- TOC entry 238 (class 1259 OID 49611)
+-- Name: saved_passengers; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.saved_passengers (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    name character varying(100) NOT NULL,
+    identity_type character varying(20),
+    identity_number character varying(30),
+    gender character varying(10),
+    date_of_birth character varying(20),
+    phone character varying(20),
+    email character varying(100)
+);
+
+
+ALTER TABLE public.saved_passengers OWNER TO postgres;
+
+--
+-- TOC entry 237 (class 1259 OID 49610)
+-- Name: saved_passengers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.saved_passengers_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.saved_passengers_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5210 (class 0 OID 0)
+-- Dependencies: 237
+-- Name: saved_passengers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.saved_passengers_id_seq OWNED BY public.saved_passengers.id;
+
+
+--
+-- TOC entry 226 (class 1259 OID 41464)
+-- Name: schedules; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.schedules (
+    schedule_id integer NOT NULL,
+    train_id integer,
+    departure_station integer,
+    arrival_station integer,
+    departure_time timestamp without time zone,
+    arrival_time timestamp without time zone,
+    price numeric(12,2)
+);
+
+
+ALTER TABLE public.schedules OWNER TO postgres;
+
+--
+-- TOC entry 225 (class 1259 OID 41463)
+-- Name: schedules_schedule_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.schedules_schedule_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.schedules_schedule_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5211 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: schedules_schedule_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.schedules_schedule_id_seq OWNED BY public.schedules.schedule_id;
+
+
+--
+-- TOC entry 228 (class 1259 OID 41487)
+-- Name: seats; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.seats (
+    seat_id integer NOT NULL,
+    train_id integer,
+    seat_number character varying(10),
+    class character varying(20) DEFAULT 'economy'::character varying,
+    CONSTRAINT seats_class_check CHECK (((class)::text = ANY ((ARRAY['economy'::character varying, 'business'::character varying, 'vip'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.seats OWNER TO postgres;
+
+--
+-- TOC entry 227 (class 1259 OID 41486)
+-- Name: seats_seat_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.seats_seat_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.seats_seat_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5212 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: seats_seat_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.seats_seat_id_seq OWNED BY public.seats.seat_id;
+
+
+--
+-- TOC entry 222 (class 1259 OID 41441)
+-- Name: stations; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.stations (
+    station_id integer NOT NULL,
+    station_name character varying(100) NOT NULL,
+    city character varying(100),
+    code character varying(10)
+);
+
+
+ALTER TABLE public.stations OWNER TO postgres;
+
+--
+-- TOC entry 221 (class 1259 OID 41440)
+-- Name: stations_station_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.stations_station_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.stations_station_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5213 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: stations_station_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.stations_station_id_seq OWNED BY public.stations.station_id;
+
+
+--
+-- TOC entry 236 (class 1259 OID 41560)
+-- Name: tickets; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tickets (
+    ticket_id integer NOT NULL,
+    booking_id integer,
+    qr_code text,
+    issued_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.tickets OWNER TO postgres;
+
+--
+-- TOC entry 235 (class 1259 OID 41559)
+-- Name: tickets_ticket_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tickets_ticket_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.tickets_ticket_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5214 (class 0 OID 0)
+-- Dependencies: 235
+-- Name: tickets_ticket_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.tickets_ticket_id_seq OWNED BY public.tickets.ticket_id;
+
+
+--
+-- TOC entry 224 (class 1259 OID 41452)
+-- Name: trains; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.trains (
+    train_id integer NOT NULL,
+    train_name character varying(100) NOT NULL,
+    train_code character varying(20),
+    total_seats integer DEFAULT 600
+);
+
+
+ALTER TABLE public.trains OWNER TO postgres;
+
+--
+-- TOC entry 223 (class 1259 OID 41451)
+-- Name: trains_train_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.trains_train_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.trains_train_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5215 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: trains_train_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.trains_train_id_seq OWNED BY public.trains.train_id;
+
+
+--
+-- TOC entry 220 (class 1259 OID 41420)
+-- Name: users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users (
+    user_id integer NOT NULL,
+    full_name character varying(100) NOT NULL,
+    email character varying(100) NOT NULL,
+    phone character varying(20) NOT NULL,
+    password_hash text NOT NULL,
+    role character varying(20) DEFAULT 'customer'::character varying,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    status character varying(20) DEFAULT 'active'::character varying,
+    CONSTRAINT users_role_check CHECK (((role)::text = ANY ((ARRAY['customer'::character varying, 'admin'::character varying])::text[])))
+);
+
+
+ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- TOC entry 219 (class 1259 OID 41419)
+-- Name: users_user_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.users_user_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE public.users_user_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 5216 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: users_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.users_user_id_seq OWNED BY public.users.user_id;
+
+
+--
+-- TOC entry 4952 (class 2604 OID 49645)
+-- Name: admin_logs id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admin_logs ALTER COLUMN id SET DEFAULT nextval('public.admin_logs_id_seq'::regclass);
+
+
+--
+-- TOC entry 4949 (class 2604 OID 49631)
+-- Name: admins id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admins ALTER COLUMN id SET DEFAULT nextval('public.admins_id_seq'::regclass);
+
+
+--
+-- TOC entry 4940 (class 2604 OID 41528)
+-- Name: booking_passengers passenger_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.booking_passengers ALTER COLUMN passenger_id SET DEFAULT nextval('public.booking_passengers_passenger_id_seq'::regclass);
+
+
+--
+-- TOC entry 4936 (class 2604 OID 41505)
+-- Name: bookings booking_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bookings ALTER COLUMN booking_id SET DEFAULT nextval('public.bookings_booking_id_seq'::regclass);
+
+
+--
+-- TOC entry 4957 (class 2604 OID 65999)
+-- Name: failed_transactions id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.failed_transactions ALTER COLUMN id SET DEFAULT nextval('public.failed_transactions_id_seq'::regclass);
+
+
+--
+-- TOC entry 4955 (class 2604 OID 57827)
+-- Name: intruder_alerts id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.intruder_alerts ALTER COLUMN id SET DEFAULT nextval('public.intruder_alerts_id_seq'::regclass);
+
+
+--
+-- TOC entry 4954 (class 2604 OID 57806)
+-- Name: migrations id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.migrations ALTER COLUMN id SET DEFAULT nextval('public.migrations_id_seq'::regclass);
+
+
+--
+-- TOC entry 4943 (class 2604 OID 41546)
+-- Name: payments payment_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments ALTER COLUMN payment_id SET DEFAULT nextval('public.payments_payment_id_seq'::regclass);
+
+
+--
+-- TOC entry 4948 (class 2604 OID 49614)
+-- Name: saved_passengers id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.saved_passengers ALTER COLUMN id SET DEFAULT nextval('public.saved_passengers_id_seq'::regclass);
+
+
+--
+-- TOC entry 4933 (class 2604 OID 41467)
+-- Name: schedules schedule_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schedules ALTER COLUMN schedule_id SET DEFAULT nextval('public.schedules_schedule_id_seq'::regclass);
+
+
+--
+-- TOC entry 4934 (class 2604 OID 41490)
+-- Name: seats seat_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seats ALTER COLUMN seat_id SET DEFAULT nextval('public.seats_seat_id_seq'::regclass);
+
+
+--
+-- TOC entry 4930 (class 2604 OID 41444)
+-- Name: stations station_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stations ALTER COLUMN station_id SET DEFAULT nextval('public.stations_station_id_seq'::regclass);
+
+
+--
+-- TOC entry 4946 (class 2604 OID 41563)
+-- Name: tickets ticket_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tickets ALTER COLUMN ticket_id SET DEFAULT nextval('public.tickets_ticket_id_seq'::regclass);
+
+
+--
+-- TOC entry 4931 (class 2604 OID 41455)
+-- Name: trains train_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trains ALTER COLUMN train_id SET DEFAULT nextval('public.trains_train_id_seq'::regclass);
+
+
+--
+-- TOC entry 4926 (class 2604 OID 41423)
+-- Name: users user_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN user_id SET DEFAULT nextval('public.users_user_id_seq'::regclass);
+
+
+--
+-- TOC entry 5190 (class 0 OID 49642)
+-- Dependencies: 242
+-- Data for Name: admin_logs; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.admin_logs (id, admin_id, admin_name, action, target, ip_address, created_at) FROM stdin;
+1	1	Pradipta	Login	System	127.0.0.1	2026-04-29 00:57:49
+2	1	Pradipta	Login	System	127.0.0.1	2026-04-29 03:43:45
+3	1	Pradipta	Login	System	127.0.0.1	2026-04-29 23:39:05
+4	1	Pradipta	Create Schedule	Route 9 to 12	127.0.0.1	2026-04-30 00:19:45
+5	1	Pradipta	Login	System	127.0.0.1	2026-05-03 07:47:14
+6	1	Pradipta	Logout	System	127.0.0.1	2026-05-03 14:57:14
+7	1	Pradipta	Login	System	127.0.0.1	2026-05-03 14:57:24
+8	1	Pradipta	Logout	System	127.0.0.1	2026-05-03 14:57:27
+9	1	Pradipta	Login	System	127.0.0.1	2026-05-03 14:57:38
+10	1	Pradipta	Logout	System	127.0.0.1	2026-05-03 14:57:41
+11	1	Pradipta	Login	System	127.0.0.1	2026-05-03 14:57:47
+12	1	Pradipta	Login	System	127.0.0.1	2026-05-05 07:52:35
+13	1	Pradipta	Logout	System	127.0.0.1	2026-05-05 07:52:39
+14	1	Pradipta	Login	System	127.0.0.1	2026-05-05 07:52:46
+15	1	Pradipta	Login	System	127.0.0.1	2026-05-05 07:53:42
+16	1	Pradipta	Create Schedule	Route 9 to 10	127.0.0.1	2026-05-05 07:55:19
+17	1	Pradipta	Create Schedule	Route 9 to 12	127.0.0.1	2026-05-05 07:56:06
+18	1	Pradipta	Logout	System	127.0.0.1	2026-05-05 09:03:36
+19	3	System Manager	Login	System	127.0.0.1	2026-05-05 09:12:26
+20	3	System Manager	Logout	System	127.0.0.1	2026-05-05 09:16:20
+21	3	System Manager	Login	System	127.0.0.1	2026-05-05 09:16:28
+22	3	System Manager	Logout	System	127.0.0.1	2026-05-05 09:57:13
+23	1	Pradipta	Login	System	127.0.0.1	2026-05-05 09:57:19
+24	1	Pradipta	Logout	System	127.0.0.1	2026-05-05 11:05:23
+25	1	Pradipta	Login	System	127.0.0.1	2026-05-05 11:06:38
+26	1	Pradipta	Logout	System	127.0.0.1	2026-05-05 11:08:15
+27	1	Pradipta	Login	System	127.0.0.1	2026-05-05 11:08:40
+28	1	Pradipta	Logout	System	127.0.0.1	2026-05-05 11:09:01
+29	1	Pradipta	Login	System	127.0.0.1	2026-05-05 11:09:30
+30	1	Pradipta	Logout	System	127.0.0.1	2026-05-05 11:15:19
+31	1	Pradipta	Login	System	127.0.0.1	2026-05-05 11:16:42
+32	1	Pradipta	Logout	System	127.0.0.1	2026-05-05 11:21:29
+33	1	Pradipta	Login	System	127.0.0.1	2026-05-05 11:22:12
+34	1	Pradipta	Logout	System	127.0.0.1	2026-05-05 11:22:36
+35	1	Pradipta	Login	System	127.0.0.1	2026-05-05 11:24:44
+36	1	Pradipta	Login	System	127.0.0.1	2026-05-06 09:31:47
+37	1	Pradipta	Logout	System	127.0.0.1	2026-05-06 09:33:39
+38	3	System Manager	Login	System	127.0.0.1	2026-05-06 09:33:52
+39	3	System Manager	Logout	System	127.0.0.1	2026-05-06 09:53:39
+40	1	Pradipta	Login	System	127.0.0.1	2026-05-06 09:53:48
+41	1	Pradipta	Create Schedule	Route 9 to 12	127.0.0.1	2026-05-06 12:39:02
+42	1	Pradipta	Create Schedule	Route 9 to 12	127.0.0.1	2026-05-06 12:55:56
+43	1	Pradipta	Create Schedule	Route 9 to 12	127.0.0.1	2026-05-06 12:56:48
+44	1	Pradipta	Login	System	127.0.0.1	2026-05-06 17:46:48
+45	1	Pradipta	Login	System	127.0.0.1	2026-05-12 08:16:22
+46	1	Pradipta	Create Schedule	Route 9 to 12	127.0.0.1	2026-05-12 08:20:17
+\.
+
+
+--
+-- TOC entry 5188 (class 0 OID 49628)
+-- Dependencies: 240
+-- Data for Name: admins; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.admins (id, username, password, name, created_at, role) FROM stdin;
+1	admin	$2y$12$2sEZSlxg1u7wXmZ6LMswiODrhXXbfyJBtiupRsWcSNBHRhZUxetc6	Pradipta	2026-04-29 07:14:48.702845	ADMIN
+3	manager	$2y$12$OJAIypIj3jzSssanStJZ6uXIjVu5upy7d9pDlUW/OD.1ypob8gYUG	System Manager	2026-05-05 09:11:28.378814	MANAGER
+\.
+
+
+--
+-- TOC entry 5180 (class 0 OID 41525)
+-- Dependencies: 232
+-- Data for Name: booking_passengers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.booking_passengers (passenger_id, booking_id, full_name, id_number, seat_id, seat_class, passenger_type) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5178 (class 0 OID 41502)
+-- Dependencies: 230
+-- Data for Name: bookings; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.bookings (booking_id, user_id, schedule_id, booking_code, booking_date, total_price, status, payment_method) FROM stdin;
+5	8	17	SWIFT-B353689D	2026-04-29 04:57:55.747586	600000.00	paid	Credit Card
+6	8	17	SWIFT-A89ADE3D	2026-04-29 05:44:10.961397	600000.00	paid	QRIS
+7	8	17	SWIFT-6180AA5A	2026-04-29 05:54:24.212541	600000.00	paid	Virtual Account
+8	8	17	SWIFT-F7246460	2026-04-29 09:59:36.989277	900000.00	paid	Credit Card
+9	8	21	SWIFT-DFFECC9D	2026-04-30 07:36:41.050117	600000.00	paid	QRIS
+10	8	21	SWIFT-923BF870	2026-04-30 08:14:27.804581	450000.00	paid	Virtual Account
+11	8	19	SWIFT-2F87A8E1	2026-04-30 08:35:20.55132	600000.00	paid	Credit Card
+12	8	19	SWIFT-5FE808B7	2026-04-30 08:43:55.982718	600000.00	paid	QRIS
+16	42	19	SWIFT-CFA39CEF	2026-04-30 09:16:31.260991	450000.00	paid	Virtual Account
+17	42	19	SWIFT-783E0896	2026-04-30 09:42:10.94798	450000.00	paid	Credit Card
+18	42	19	SWIFT-74A5FC0D	2026-04-30 09:53:29.257881	450000.00	paid	QRIS
+19	42	19	SWIFT-D64CD2D6	2026-04-30 09:59:51.730427	600000.00	paid	Virtual Account
+20	42	19	SWIFT-0FEF531F	2026-04-30 10:07:07.127214	600000.00	paid	Credit Card
+21	42	19	SWIFT-4A6BA95C	2026-04-30 10:13:24.705076	250000.00	paid	QRIS
+22	42	19	SWIFT-D9D7C072	2026-04-30 10:20:07.92524	450000.00	paid	Virtual Account
+23	42	19	SWIFT-62D3AC3F	2026-04-30 10:32:28.044833	450000.00	paid	Credit Card
+24	42	19	SWIFT-056ED4A9	2026-04-30 10:36:56.704599	450000.00	paid	QRIS
+25	42	19	SWIFT-D444DED4	2026-04-30 10:42:47.269132	600000.00	paid	Virtual Account
+26	42	19	SWIFT-07DCF683	2026-04-30 10:50:22.321872	450000.00	paid	Credit Card
+27	42	19	SWIFT-9B201074	2026-04-30 10:54:05.34095	450000.00	paid	QRIS
+28	42	19	SWIFT-50C94ED8	2026-04-30 10:57:55.19052	250000.00	paid	Virtual Account
+29	42	19	SWIFT-9CD64862	2026-04-30 11:00:47.282115	250000.00	paid	Credit Card
+30	42	19	SWIFT-5E87B1EA	2026-04-30 11:04:20.013	250000.00	paid	QRIS
+31	42	19	SWIFT-818E6BDA	2026-04-30 11:07:36.305716	250000.00	paid	Virtual Account
+32	42	19	SWIFT-BD3D327F	2026-04-30 11:12:11.403759	250000.00	paid	Credit Card
+33	42	19	SWIFT-865F70A1	2026-04-30 11:15:39.789334	250000.00	paid	QRIS
+34	42	19	SWIFT-5D7A05B6	2026-04-30 11:20:41.422036	250000.00	paid	Virtual Account
+35	42	19	SWIFT-5A650448	2026-04-30 11:23:56.39518	600000.00	paid	Credit Card
+36	42	19	SWIFT-8754DEDB	2026-04-30 11:26:58.68642	250000.00	paid	QRIS
+37	42	19	SWIFT-F73E9F8B	2026-04-30 11:37:08.481019	250000.00	paid	Virtual Account
+38	42	19	SWIFT-6AFE8DF2	2026-04-30 11:44:24.646769	250000.00	paid	Credit Card
+39	42	17	SWIFT-9C4CFA0D	2026-04-30 13:27:56.160747	250000.00	paid	QRIS
+40	42	17	SWIFT-B5B474DA	2026-04-30 13:35:05.925961	250000.00	paid	Virtual Account
+41	42	17	SWIFT-7A919329	2026-04-30 13:39:24.901838	250000.00	paid	Credit Card
+42	42	19	SWIFT-197C1D0D	2026-04-30 13:39:44.652231	250000.00	paid	QRIS
+43	42	17	SWIFT-AA2D310E	2026-04-30 13:48:58.265223	250000.00	paid	Virtual Account
+44	42	17	SWIFT-B9776D31	2026-04-30 14:02:50.308188	250000.00	paid	Credit Card
+45	42	17	SWIFT-1B81F716	2026-04-30 14:12:00.223756	600000.00	paid	QRIS
+46	42	17	SWIFT-ED66AA4F	2026-04-30 14:22:33.035746	250000.00	paid	Virtual Account
+47	42	17	SWIFT-E55F952F	2026-04-30 14:36:24.194758	250000.00	paid	Credit Card
+48	42	17	SWIFT-08AB04AD	2026-04-30 15:09:39.045359	250000.00	paid	QRIS
+49	42	17	SWIFT-BA82B640	2026-04-30 16:17:44.450235	450000.00	pending	Virtual Account
+50	42	17	SWIFT-A0303085	2026-04-30 16:25:00.638813	250000.00	paid	Credit Card
+51	42	17	SWIFT-FEF07DED	2026-04-30 16:25:42.645057	250000.00	paid	QRIS
+52	42	17	SWIFT-8E14B3B6	2026-04-30 16:27:02.143257	250000.00	pending	Virtual Account
+53	42	17	SWIFT-811E5129	2026-04-30 16:52:44.387065	250000.00	paid	Credit Card
+54	42	17	SWIFT-3E48B46F	2026-04-30 17:45:59.432346	250000.00	paid	QRIS
+55	42	17	SWIFT-C99C5148	2026-04-30 17:46:23.368659	250000.00	paid	Virtual Account
+56	42	17	SWIFT-30859B6B	2026-04-30 17:50:02.867167	250000.00	paid	Credit Card
+57	42	17	SWIFT-2601CCF2	2026-04-30 17:59:52.527499	250000.00	paid	QRIS
+\.
+
+
+--
+-- TOC entry 5196 (class 0 OID 65996)
+-- Dependencies: 248
+-- Data for Name: failed_transactions; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.failed_transactions (id, user_id, schedule_id, error_reason, payload, ip_address, created_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5194 (class 0 OID 57824)
+-- Dependencies: 246
+-- Data for Name: intruder_alerts; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.intruder_alerts (id, ip_address, username_attempted, photo_path, location, city, browser, attempt_time, is_resolved, created_at, updated_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5192 (class 0 OID 57803)
+-- Dependencies: 244
+-- Data for Name: migrations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.migrations (id, migration, batch) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5182 (class 0 OID 41543)
+-- Dependencies: 234
+-- Data for Name: payments; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.payments (payment_id, booking_id, payment_method, payment_date, amount, payment_status) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5186 (class 0 OID 49611)
+-- Dependencies: 238
+-- Data for Name: saved_passengers; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.saved_passengers (id, user_id, name, identity_type, identity_number, gender, date_of_birth, phone, email) FROM stdin;
+1	8	khbhijn	Identity No.	08585888	Male	2026-04-29	93556999	yfyhhg@gmail.com
+2	8	Pradipta	Identity No.	08551318166	Male	2026-04-22	085219583336	pradipta02032009@gmail.com
+3	8	Pradipta Endra Maulana	Identity No.	02023020009	Male	2026-04-22		
+5	8	Pradipta Endra Maulana	Identity No.	08521864856	Male	2009-04-27		
+6	8	Alyzza Nazwa Aulia	Identity No.	0851548454545	Male	2009-02-24		
+14	42	Pradipta Endra Maulana	Identity No.	54364646	Male	2026-05-18		
+\.
+
+
+--
+-- TOC entry 5174 (class 0 OID 41464)
+-- Dependencies: 226
+-- Data for Name: schedules; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.schedules (schedule_id, train_id, departure_station, arrival_station, departure_time, arrival_time, price) FROM stdin;
+17	5	9	12	2026-05-01 08:00:00	2026-05-01 08:45:00	250000.00
+18	5	12	9	2026-05-01 10:00:00	2026-05-01 10:45:00	250000.00
+19	6	9	12	2026-05-01 13:00:00	2026-05-01 13:45:00	250000.00
+20	6	12	9	2026-05-01 15:00:00	2026-05-01 15:45:00	250000.00
+21	9	9	12	2026-04-30 07:19:00	2026-04-30 11:19:00	650000.00
+22	10	9	10	2026-05-05 07:55:00	2026-05-05 11:55:00	300000.00
+23	10	9	12	2026-05-05 07:55:00	2026-05-05 13:55:00	350000.00
+24	5	9	12	2026-05-04 08:00:00	2026-05-04 08:45:00	250000.00
+25	5	12	9	2026-05-04 10:00:00	2026-05-04 10:45:00	250000.00
+26	6	9	12	2026-05-04 13:00:00	2026-05-04 13:45:00	250000.00
+27	6	12	9	2026-05-04 15:00:00	2026-05-04 15:45:00	250000.00
+28	5	9	12	2026-05-06 12:38:00	2026-05-06 15:38:00	25000.00
+29	6	9	12	2026-05-06 12:55:00	2026-05-06 18:55:00	350000.00
+30	6	9	12	2026-05-06 15:56:00	2026-05-06 18:56:00	300000.00
+31	9	9	12	2026-05-12 14:25:00	2026-05-12 17:20:00	300000.00
+\.
+
+
+--
+-- TOC entry 5176 (class 0 OID 41487)
+-- Dependencies: 228
+-- Data for Name: seats; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.seats (seat_id, train_id, seat_number, class) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5170 (class 0 OID 41441)
+-- Dependencies: 222
+-- Data for Name: stations; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.stations (station_id, station_name, city, code) FROM stdin;
+9	Halim	Jakarta	HLM
+10	Karawang	Karawang	KRW
+11	Padalarang	Bandung Barat	PDL
+12	Tegalluar	Bandung	TGL
+\.
+
+
+--
+-- TOC entry 5184 (class 0 OID 41560)
+-- Dependencies: 236
+-- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tickets (ticket_id, booking_id, qr_code, issued_at) FROM stdin;
+\.
+
+
+--
+-- TOC entry 5172 (class 0 OID 41452)
+-- Dependencies: 224
+-- Data for Name: trains; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.trains (train_id, train_name, train_code, total_seats) FROM stdin;
+5	Whoosh Fast	W-FAST-01	600
+6	Whoosh Express	W-EXP-02	600
+9	Whoosh VIP	W-VIP-03	600
+10	WHOOSH TEST	Gacor	600
+\.
+
+
+--
+-- TOC entry 5168 (class 0 OID 41420)
+-- Dependencies: 220
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.users (user_id, full_name, email, phone, password_hash, role, created_at, status) FROM stdin;
+7	Pradipta Tes	tes@gmail.com	085323646888	$2y$12$MKxDVYzEdJwR6ux46E8qMePDJCYMyefQqzwcl8TL0ZGYUavx46c6C	customer	2026-04-27 19:53:08.498413	active
+8	Alyzza Nazwa Aulia	alyzzanazwaaulia@gmail.com	081779839434	$2y$12$Xbc/qfmlTcH8Lb18dlX42.OdJgb7oafTOMjadeaLnsLOEf7DhRFF2	customer	2026-04-28 10:25:53.011741	active
+41	Arva Fajar Akbar	arva@gmail.com	0852194538888	$2y$12$IGg/N69GJ7tYm2uKo/SAkOYx0w1n8oRwk0BFX6LUkRASaFFrGbGN2	customer	2026-04-29 07:59:29.712499	active
+42	Pradipta Endra Maulana	pradipta02032009@gmail.com	085219583336	$2y$12$82wIUC87yjLKc/w0g497MuRfCXVOPcH0AQu77fH5iVwv.iB.46ssW	customer	2026-04-30 08:48:44.264676	active
+43	Fathin	fathin@gmail.com	08512844666	$2y$12$7Bdlp/kJLSGqb7otms6rAuwXOz802qwNmw9SsDK/aBLe2TjGpnfBW	customer	2026-05-05 13:40:16.195619	active
+\.
+
+
+--
+-- TOC entry 5217 (class 0 OID 0)
+-- Dependencies: 241
+-- Name: admin_logs_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.admin_logs_id_seq', 46, true);
+
+
+--
+-- TOC entry 5218 (class 0 OID 0)
+-- Dependencies: 239
+-- Name: admins_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.admins_id_seq', 3, true);
+
+
+--
+-- TOC entry 5219 (class 0 OID 0)
+-- Dependencies: 231
+-- Name: booking_passengers_passenger_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.booking_passengers_passenger_id_seq', 1, false);
+
+
+--
+-- TOC entry 5220 (class 0 OID 0)
+-- Dependencies: 229
+-- Name: bookings_booking_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.bookings_booking_id_seq', 57, true);
+
+
+--
+-- TOC entry 5221 (class 0 OID 0)
+-- Dependencies: 247
+-- Name: failed_transactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.failed_transactions_id_seq', 1, false);
+
+
+--
+-- TOC entry 5222 (class 0 OID 0)
+-- Dependencies: 245
+-- Name: intruder_alerts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.intruder_alerts_id_seq', 6, true);
+
+
+--
+-- TOC entry 5223 (class 0 OID 0)
+-- Dependencies: 243
+-- Name: migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.migrations_id_seq', 1, false);
+
+
+--
+-- TOC entry 5224 (class 0 OID 0)
+-- Dependencies: 233
+-- Name: payments_payment_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.payments_payment_id_seq', 1, false);
+
+
+--
+-- TOC entry 5225 (class 0 OID 0)
+-- Dependencies: 237
+-- Name: saved_passengers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.saved_passengers_id_seq', 56, true);
+
+
+--
+-- TOC entry 5226 (class 0 OID 0)
+-- Dependencies: 225
+-- Name: schedules_schedule_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.schedules_schedule_id_seq', 31, true);
+
+
+--
+-- TOC entry 5227 (class 0 OID 0)
+-- Dependencies: 227
+-- Name: seats_seat_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.seats_seat_id_seq', 1, true);
+
+
+--
+-- TOC entry 5228 (class 0 OID 0)
+-- Dependencies: 221
+-- Name: stations_station_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.stations_station_id_seq', 13, true);
+
+
+--
+-- TOC entry 5229 (class 0 OID 0)
+-- Dependencies: 235
+-- Name: tickets_ticket_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tickets_ticket_id_seq', 1, false);
+
+
+--
+-- TOC entry 5230 (class 0 OID 0)
+-- Dependencies: 223
+-- Name: trains_train_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.trains_train_id_seq', 10, true);
+
+
+--
+-- TOC entry 5231 (class 0 OID 0)
+-- Dependencies: 219
+-- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_user_id_seq', 43, true);
+
+
+--
+-- TOC entry 5001 (class 2606 OID 49652)
+-- Name: admin_logs admin_logs_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admin_logs
+    ADD CONSTRAINT admin_logs_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4997 (class 2606 OID 49638)
+-- Name: admins admins_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admins
+    ADD CONSTRAINT admins_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4999 (class 2606 OID 49640)
+-- Name: admins admins_username_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admins
+    ADD CONSTRAINT admins_username_key UNIQUE (username);
+
+
+--
+-- TOC entry 4987 (class 2606 OID 41531)
+-- Name: booking_passengers booking_passengers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.booking_passengers
+    ADD CONSTRAINT booking_passengers_pkey PRIMARY KEY (passenger_id);
+
+
+--
+-- TOC entry 4983 (class 2606 OID 41513)
+-- Name: bookings bookings_booking_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_booking_code_key UNIQUE (booking_code);
+
+
+--
+-- TOC entry 4985 (class 2606 OID 41511)
+-- Name: bookings bookings_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_pkey PRIMARY KEY (booking_id);
+
+
+--
+-- TOC entry 5007 (class 2606 OID 66006)
+-- Name: failed_transactions failed_transactions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.failed_transactions
+    ADD CONSTRAINT failed_transactions_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 5005 (class 2606 OID 57833)
+-- Name: intruder_alerts intruder_alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.intruder_alerts
+    ADD CONSTRAINT intruder_alerts_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 5003 (class 2606 OID 57811)
+-- Name: migrations migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.migrations
+    ADD CONSTRAINT migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4989 (class 2606 OID 41553)
+-- Name: payments payments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments
+    ADD CONSTRAINT payments_pkey PRIMARY KEY (payment_id);
+
+
+--
+-- TOC entry 4993 (class 2606 OID 49619)
+-- Name: saved_passengers saved_passengers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.saved_passengers
+    ADD CONSTRAINT saved_passengers_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 4995 (class 2606 OID 49621)
+-- Name: saved_passengers saved_passengers_user_id_identity_number_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.saved_passengers
+    ADD CONSTRAINT saved_passengers_user_id_identity_number_key UNIQUE (user_id, identity_number);
+
+
+--
+-- TOC entry 4979 (class 2606 OID 41470)
+-- Name: schedules schedules_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schedules
+    ADD CONSTRAINT schedules_pkey PRIMARY KEY (schedule_id);
+
+
+--
+-- TOC entry 4981 (class 2606 OID 41495)
+-- Name: seats seats_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seats
+    ADD CONSTRAINT seats_pkey PRIMARY KEY (seat_id);
+
+
+--
+-- TOC entry 4971 (class 2606 OID 41450)
+-- Name: stations stations_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stations
+    ADD CONSTRAINT stations_code_key UNIQUE (code);
+
+
+--
+-- TOC entry 4973 (class 2606 OID 41448)
+-- Name: stations stations_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.stations
+    ADD CONSTRAINT stations_pkey PRIMARY KEY (station_id);
+
+
+--
+-- TOC entry 4991 (class 2606 OID 41569)
+-- Name: tickets tickets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tickets
+    ADD CONSTRAINT tickets_pkey PRIMARY KEY (ticket_id);
+
+
+--
+-- TOC entry 4975 (class 2606 OID 41460)
+-- Name: trains trains_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trains
+    ADD CONSTRAINT trains_pkey PRIMARY KEY (train_id);
+
+
+--
+-- TOC entry 4977 (class 2606 OID 41462)
+-- Name: trains trains_train_code_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.trains
+    ADD CONSTRAINT trains_train_code_key UNIQUE (train_code);
+
+
+--
+-- TOC entry 4965 (class 2606 OID 41437)
+-- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_email_key UNIQUE (email);
+
+
+--
+-- TOC entry 4967 (class 2606 OID 41439)
+-- Name: users users_phone_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_phone_key UNIQUE (phone);
+
+
+--
+-- TOC entry 4969 (class 2606 OID 41435)
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT users_pkey PRIMARY KEY (user_id);
+
+
+--
+-- TOC entry 5019 (class 2606 OID 49653)
+-- Name: admin_logs admin_logs_admin_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.admin_logs
+    ADD CONSTRAINT admin_logs_admin_id_fkey FOREIGN KEY (admin_id) REFERENCES public.admins(id) ON DELETE SET NULL;
+
+
+--
+-- TOC entry 5014 (class 2606 OID 41532)
+-- Name: booking_passengers booking_passengers_booking_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.booking_passengers
+    ADD CONSTRAINT booking_passengers_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(booking_id);
+
+
+--
+-- TOC entry 5015 (class 2606 OID 41537)
+-- Name: booking_passengers booking_passengers_seat_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.booking_passengers
+    ADD CONSTRAINT booking_passengers_seat_id_fkey FOREIGN KEY (seat_id) REFERENCES public.seats(seat_id);
+
+
+--
+-- TOC entry 5012 (class 2606 OID 41519)
+-- Name: bookings bookings_schedule_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_schedule_id_fkey FOREIGN KEY (schedule_id) REFERENCES public.schedules(schedule_id);
+
+
+--
+-- TOC entry 5013 (class 2606 OID 41514)
+-- Name: bookings bookings_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.bookings
+    ADD CONSTRAINT bookings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
+
+
+--
+-- TOC entry 5016 (class 2606 OID 41554)
+-- Name: payments payments_booking_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.payments
+    ADD CONSTRAINT payments_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(booking_id);
+
+
+--
+-- TOC entry 5018 (class 2606 OID 49622)
+-- Name: saved_passengers saved_passengers_user_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.saved_passengers
+    ADD CONSTRAINT saved_passengers_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id);
+
+
+--
+-- TOC entry 5008 (class 2606 OID 41481)
+-- Name: schedules schedules_arrival_station_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schedules
+    ADD CONSTRAINT schedules_arrival_station_fkey FOREIGN KEY (arrival_station) REFERENCES public.stations(station_id);
+
+
+--
+-- TOC entry 5009 (class 2606 OID 41476)
+-- Name: schedules schedules_departure_station_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schedules
+    ADD CONSTRAINT schedules_departure_station_fkey FOREIGN KEY (departure_station) REFERENCES public.stations(station_id);
+
+
+--
+-- TOC entry 5010 (class 2606 OID 41471)
+-- Name: schedules schedules_train_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.schedules
+    ADD CONSTRAINT schedules_train_id_fkey FOREIGN KEY (train_id) REFERENCES public.trains(train_id);
+
+
+--
+-- TOC entry 5011 (class 2606 OID 41496)
+-- Name: seats seats_train_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.seats
+    ADD CONSTRAINT seats_train_id_fkey FOREIGN KEY (train_id) REFERENCES public.trains(train_id);
+
+
+--
+-- TOC entry 5017 (class 2606 OID 41570)
+-- Name: tickets tickets_booking_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tickets
+    ADD CONSTRAINT tickets_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(booking_id);
+
+
+-- Completed on 2026-05-12 09:01:00
+
+--
+-- PostgreSQL database dump complete
+--
+
+\unrestrict zsK1Ugcl11jiKpxeruIJ12VM12DblxnPFzGR6DIKD3LRS2v0eqFWhfc1dgBTxch
+

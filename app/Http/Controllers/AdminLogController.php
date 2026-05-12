@@ -15,4 +15,15 @@ class AdminLogController extends Controller
 
         return view('admin.logs', compact('logs'));
     }
+
+    public function failedTransactions()
+    {
+        $failedTransactions = DB::table('failed_transactions')
+            ->leftJoin('users', 'failed_transactions.user_id', '=', 'users.user_id')
+            ->select('failed_transactions.*', 'users.full_name', 'users.email')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return view('admin.failed_transactions', compact('failedTransactions'));
+    }
 }

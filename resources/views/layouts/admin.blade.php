@@ -113,7 +113,7 @@
                 </div>
             </div>
 
-            <div x-data="{ open: {{ request()->routeIs('admin.logs') ? 'true' : 'false' }} }" class="pt-2">
+            <div x-data="{ open: {{ request()->routeIs('admin.logs') || request()->routeIs('admin.failed_transactions') || request()->routeIs('admin.security.intruders') ? 'true' : 'false' }} }" class="pt-2">
                 <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors text-slate-500 hover:bg-slate-50 hover:text-slate-900">
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -124,6 +124,7 @@
                 <div x-show="open" x-collapse x-cloak>
                     <div class="mt-1 space-y-1 bg-slate-50 rounded-lg p-1">
                         <a href="{{ route('admin.logs') }}" class="block p-2 pl-11 rounded-md text-xs transition-colors {{ request()->routeIs('admin.logs') ? 'text-red-600 font-bold' : 'text-slate-500 hover:text-slate-900' }}">Admin Logs</a>
+                        <a href="{{ route('admin.failed_transactions') }}" class="block p-2 pl-11 rounded-md text-xs transition-colors {{ request()->routeIs('admin.failed_transactions') ? 'text-red-600 font-bold' : 'text-slate-500 hover:text-slate-900' }}">Failed Transactions</a>
                         <a href="{{ route('admin.security.intruders') }}" class="block p-2 pl-11 rounded-md text-xs transition-colors {{ request()->routeIs('admin.security.intruders') ? 'text-red-600 font-bold' : 'text-slate-500 hover:text-slate-900' }}">
                             Intruder Alerts 
                             @php $alertCount = DB::table('intruder_alerts')->where('is_resolved', false)->count(); @endphp

@@ -23,7 +23,7 @@ class DashboardController extends Controller
         
         // Admin specific stats
         $activeSessions = rand(120, 150);
-        $failedBookings = DB::table('bookings')->where('status', 'failed')->count();
+        $failedBookings = DB::table('failed_transactions')->count();
         
         $registrationTrends = DB::table('users')
             ->select(DB::raw("DATE(created_at) as date"), DB::raw('count(*) as count'))

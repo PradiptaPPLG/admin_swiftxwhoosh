@@ -14,9 +14,9 @@ Daftar fitur dan metrik yang wajib ada di dashboard Admin untuk pemantauan tekni
 - [ ] **Permission Management** (SKIP: Butuh sistem RBAC kompleks).
 
 ## 3. Manajemen Pengguna & Data (Data Management)
-- [ ] **User Control Center**: Fitur untuk mencari user (Quick Search Integrated).
+- [x] **User Control Center**: Fitur untuk mencari user (Quick Search Integrated) dan manajemen akun.
 - [x] **Registration Trends**: Grafik pertumbuhan pengguna baru setiap hari/minggu.
-- [ ] **Data Integrity Check** (SKIP: Butuh logika validasi jadwal mendalam).
+- [x] **Data Integrity Check**: Validasi bentrok jadwal untuk mencegah double-booking fisik kereta.
 
 ## 4. Aliran Transaksi (Transaction Stream)
 - [x] **Real-time Booking Feed**: Daftar transaksi terbaru yang masuk ke sistem secara live.
@@ -24,9 +24,9 @@ Daftar fitur dan metrik yang wajib ada di dashboard Admin untuk pemantauan tekni
 
 ## 5. Item yang Di-skip (Butuh Integrasi/Logika Kompleks)
 - [ ] **Permission Management**: Butuh tabel roles/permissions dan middleware RBAC.
-- [ ] **Data Integrity Check**: Butuh worker background untuk validasi bentrok jadwal.
-- [ ] **Advanced User Control**: Butuh CRUD user lengkap dengan fitur ban/reset password.
-- [ ] **Failed Transaction Tracker**: Pemantauan transaksi yang gagal untuk troubleshooting.
+- [x] **Data Integrity Check**: Validasi jadwal bentrok sudah diimplementasikan di AdminScheduleController.
+- [x] **Advanced User Control**: Sudah diimplementasikan melalui halaman Users (CRUD, Search, Ban, Reset Password).
+- [x] **Failed Transaction Tracker**: Pemantauan transaksi yang gagal untuk troubleshooting.
 
 ---
 *Catatan: Item dengan tanda [x] sudah diimplementasikan atau divisualisasikan dalam dashboard saat ini.*

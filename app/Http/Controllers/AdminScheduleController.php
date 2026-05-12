@@ -53,6 +53,25 @@ class AdminScheduleController extends Controller
             'price' => 'required|numeric'
         ]);
 
+        // 1. Data Integrity: Arrival must be after Departure
+        if (strtotime($request->departure_time) >= strtotime($request->arrival_time)) {
+            return redirect()->back()->with('error', 'Integritas Data Gagal: Waktu kedatangan harus lebih lambat dari waktu keberangkatan.');
+        }
+
+        // 2. Data Integrity: Prevent Train Overlapping Schedules
+        $conflict = DB::table('schedules')
+            ->where('train_id', $request->train_id)
+            ->where(function($query) use ($request) {
+                // Formula Overlap: (StartA < EndB) AND (EndA > StartB)
+                $query->where('departure_time', '<', $request->arrival_time)
+                      ->where('arrival_time', '>', $request->departure_time);
+            })
+            ->first();
+
+        if ($conflict) {
+            return redirect()->back()->with('error', 'Integritas Data Gagal: Bentrok! Kereta ini sudah dijadwalkan pada waktu tersebut (Schedule ID: ' . $conflict->schedule_id . '). Silakan pilih kereta lain atau ganti jam keberangkatan.');
+        }
+
         DB::table('schedules')->insert([
             'train_id' => $request->train_id,
             'departure_station' => $request->departure_station,

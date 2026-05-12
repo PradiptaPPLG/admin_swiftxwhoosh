@@ -34,6 +34,8 @@ Route::middleware(['admin.session'])->group(function () {
     Route::middleware(['role:ADMIN'])->group(function () {
         Route::get('/admin/bookings', [AdminBookingController::class, 'index'])->name('admin.bookings');
         Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users');
+        Route::post('/admin/users/{id}/ban', [AdminUserController::class, 'toggleBan'])->name('admin.users.ban');
+        Route::post('/admin/users/{id}/reset-password', [AdminUserController::class, 'resetPassword'])->name('admin.users.reset');
         Route::get('/admin/passengers', [AdminPassengerController::class, 'index'])->name('admin.passengers');
         Route::get('/admin/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
         Route::post('/admin/schedules', [AdminScheduleController::class, 'store'])->name('admin.schedules.store');
@@ -42,5 +44,6 @@ Route::middleware(['admin.session'])->group(function () {
         Route::post('/admin/fleet', [AdminFleetController::class, 'store'])->name('admin.fleet.store');
         Route::delete('/admin/fleet/{id}', [AdminFleetController::class, 'destroy'])->name('admin.fleet.destroy');
         Route::get('/admin/logs', [AdminLogController::class, 'index'])->name('admin.logs');
+        Route::get('/admin/failed-transactions', [AdminLogController::class, 'failedTransactions'])->name('admin.failed_transactions');
     });
 });
